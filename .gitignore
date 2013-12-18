@@ -1,5 +1,10 @@
+db.txt
+
 *.py[cod]
 *.zip
+*.swp
+
+/logs
 
 # C extensions
 *.so

@@ -91,32 +91,6 @@ def sql_execute(sql):
     db.close()
 
 
-'''
-def process_log(fp, db, pc):
-    f = open(fp, 'r')
-    factory = FactoryEvent()
-    factory_sql = FactorySql()
-    queries = []
-    for line in f:
-        data = factory.process(line[25:-1])
-        if data is None:
-            continue
-        event = data[0]
-        damage = data[1]
-        sql = factory_sql.process(event, damage)
-        if sql is None:
-            continue
-        queries.append(sql)
-        pc.check(event['player_a']['steam_id'], event['player_a']['alias'])
-        pc.check(event['player_b']['steam_id'], event['player_b']['alias'])
-    if pc.has_new:
-        pc.submit_and_update(db)
-    c = db.cursor()
-    for q in queries:
-        c.execute(q.generate(pc))
-    c.close()
-    db.commit()
-'''
 def process_log(fp,  pc):
     f = open(fp, 'r')
     factory = FactoryEvent()
@@ -169,7 +143,7 @@ def execute_queries(db, pc, queries):
 
 
 def process():
-    logs = get_logs()
+    logs = get_logs('logs')
     db = get_mysql()
     pc = ProfileContainer()
     pc.update(db)
@@ -218,12 +192,3 @@ def is_log_finish(fp):
 
 if __name__ == '__main__':
     process()
-    '''
-    logs = get_logs()
-    db = get_mysql()
-    pc = ProfileContainer()
-    pc.update(db)
-    for l in logs:
-        process_log(l, db, pc)
-    db.close()
-    '''
