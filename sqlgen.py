@@ -34,6 +34,18 @@ class MatchSql(object):
         return match_id.values()[0]
 
 
+class ActionSql(object):
+
+
+    @staticmethod
+    def get_team(player):
+        if player['team'] == 'TERRORIST':
+            return 1
+        elif player['team'] == 'CT':
+            return 0
+        raise Exception("No team found")
+
+
 class AttackSql(object):
 
 
@@ -45,13 +57,15 @@ class AttackSql(object):
 
     @staticmethod
     def generate(match_id, event, damage):
+        team = ActionSql.get_team(event['player_a'])
         return AttackInsert(match_id,
                             event['player_a']['steam_id'],
                             event['player_b']['steam_id'],
                             damage['weapon'],
                             damage['hitgroup'],
                             int(damage['damage']),
-                            int(damage['damage_armor']))
+                            int(damage['damage_armor']),
+                            team)
 
 
 class KillSql(object):
@@ -70,26 +84,29 @@ class KillSql(object):
             headshot = int(kill['headshot'])
         except KeyError:
             headshot = 0
+        team = ActionSql.get_team(event['player_a'])
         return KillInsert(match_id,
                           event['player_a']['steam_id'],
                           event['player_b']['steam_id'],
                           kill['weapon'],
-                          headshot)
+                          headshot,
+                          team)
 
 
 class AttackInsert(object):
 
 
     sql = 'INSERT INTO `Attack` (`match_id`, `player_a`, `player_b`, '\
-          '`weapon`, `hitgroup`, `damage`, `damage_armor`) '\
-          'VALUES ({}, "{}","{}","{}","{}",{},{});'
+          '`team`, `weapon`, `hitgroup`, `damage`, `damage_armor`) '\
+          'VALUES ({},"{}","{}",{},"{}","{}",{},{});'
 
 
     def __init__(self, match_id, player_a, player_b, weapon, hitgroup, damage, 
-                 damage_armor):
+                 damage_armor, team):
         self.match_id = match_id
         self.player_a = player_a
         self.player_b = player_b
+        self.team = team
         self.weapon = weapon
         self.hitgroup = hitgroup
         self.damage = int(damage)
@@ -103,7 +120,8 @@ class AttackInsert(object):
             raise Exception("Cannot find player's steam_id")
         return AttackInsert.sql.format(self.match_id,
                                        player_a,
-                                       player_b, 
+                                       player_b,
+                                       self.team,
                                        self.weapon,
                                        self.hitgroup,
                                        self.damage,
@@ -114,15 +132,16 @@ class KillInsert(object):
 
 
     sql = 'INSERT INTO `Kill` (`match_id`, `player_a`, `player_b`, `weapon`, '\
-          '`headshot`) VALUES ({}, "{}", "{}", "{}", {});'
+          '`headshot`,`team`) VALUES ({},"{}","{}","{}",{},{});'
 
 
-    def __init__(self, match_id, player_a, player_b, weapon, headshot):
+    def __init__(self, match_id, player_a, player_b, weapon, headshot, team):
         self.match_id = match_id
         self.player_a = player_a
         self.player_b = player_b
         self.weapon = weapon
         self.headshot = int(headshot)
+        self.team = team
 
 
     def generate(self, pc):
@@ -134,4 +153,5 @@ class KillInsert(object):
                                      player_a,
                                      player_b,
                                      self.weapon,
-                                     self.headshot)
+                                     self.headshot,
+                                     self.team)
