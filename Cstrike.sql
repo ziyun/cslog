@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.3
+-- version 3.4.10.1deb1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 17, 2013 at 07:50 PM
--- Server version: 5.5.25
--- PHP Version: 5.4.4
+-- Generation Time: Dec 19, 2013 at 06:15 PM
+-- Server version: 5.5.31
+-- PHP Version: 5.3.10-1ubuntu3.9
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
@@ -19,8 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `Cstrike`
 --
-CREATE DATABASE IF NOT EXISTS `Cstrike` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-USE `Cstrike`;
 
 -- --------------------------------------------------------
 
@@ -34,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `Alias` (
   `alias` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`row_id`),
   KEY `profile_id` (`profile_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
 
 -- --------------------------------------------------------
 
@@ -47,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `Attack` (
   `match_id` int(10) unsigned NOT NULL,
   `player_a` int(10) unsigned NOT NULL,
   `player_b` int(10) unsigned NOT NULL,
+  `team` tinyint(4) NOT NULL,
   `weapon` enum('galil','ak47','scout','sg552','awp','g3sg1','famas','m4a1','aug','sg550','glock','usp','p228','deagle','elite','fiveseven','m3','xm1014','mac10','tmp','mp5navy','ump45','p90','m249','knife','hegrenade') COLLATE utf8_unicode_ci NOT NULL,
   `hitgroup` enum('head','chest','stomach','left arm','left leg','right arm','right leg','generic') COLLATE utf8_unicode_ci NOT NULL,
   `damage` int(4) unsigned NOT NULL,
@@ -55,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `Attack` (
   KEY `player_a` (`player_a`),
   KEY `player_b` (`player_b`),
   KEY `match_id` (`match_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3611 ;
 
 -- --------------------------------------------------------
 
@@ -68,13 +67,14 @@ CREATE TABLE IF NOT EXISTS `Kill` (
   `match_id` int(10) unsigned NOT NULL,
   `player_a` int(10) unsigned NOT NULL,
   `player_b` int(10) unsigned NOT NULL,
+  `team` tinyint(4) NOT NULL,
   `weapon` enum('galil','ak47','scout','sg552','awp','g3sg1','famas','m4a1','aug','sg550','glock','usp','p228','deagle','elite','fiveseven','m3','xm1014','mac10','tmp','mp5navy','ump45','p90','m249','knife','hegrenade') COLLATE utf8_unicode_ci NOT NULL,
   `headshot` tinyint(1) NOT NULL,
   PRIMARY KEY (`row_id`),
   KEY `player_a` (`player_a`),
   KEY `player_b` (`player_b`),
   KEY `match_id` (`match_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=807 ;
 
 -- --------------------------------------------------------
 
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `Match` (
   `terrorist` int(11) NOT NULL,
   `counter_terrorist` int(11) NOT NULL,
   PRIMARY KEY (`match_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=33 ;
 
 -- --------------------------------------------------------
 
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `Profile` (
   `email` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`profile_id`),
   UNIQUE KEY `steam_id` (`steam_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=8 ;
 
 --
 -- Constraints for dumped tables
@@ -121,17 +121,17 @@ ALTER TABLE `Alias`
 -- Constraints for table `Attack`
 --
 ALTER TABLE `Attack`
-  ADD CONSTRAINT `Attack_ibfk_3` FOREIGN KEY (`match_id`) REFERENCES `Match` (`match_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `Attack_ibfk_1` FOREIGN KEY (`player_a`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `Attack_ibfk_2` FOREIGN KEY (`player_b`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `Attack_ibfk_2` FOREIGN KEY (`player_b`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Attack_ibfk_3` FOREIGN KEY (`match_id`) REFERENCES `Match` (`match_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `Kill`
 --
 ALTER TABLE `Kill`
-  ADD CONSTRAINT `Kill_ibfk_3` FOREIGN KEY (`match_id`) REFERENCES `Match` (`match_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `Kill_ibfk_1` FOREIGN KEY (`player_a`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `Kill_ibfk_2` FOREIGN KEY (`player_b`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `Kill_ibfk_2` FOREIGN KEY (`player_b`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Kill_ibfk_3` FOREIGN KEY (`match_id`) REFERENCES `Match` (`match_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
