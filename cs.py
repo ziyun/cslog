@@ -150,14 +150,19 @@ def process():
     fm = FactoryMatch()
     fe = FactoryEvent()
     for i in range(0, len(logs), 2):
-        match = logs[i]
-        events = logs[i+1]
+        try:
+            match = logs[i]
+            events = logs[i+1]
+        except IndexError:
+            continue
         if not (is_log_finish(match) and is_log_finish(events)):
             continue
         match_data = fm.process(match)
         event_data = process_log(events, pc)
         update_profiles(db, pc)
         score = get_match_score(event_data)
+        if score['terrorist'] is None or score['counter_terrorist'] is None:
+            continue
         match_id = MatchSql.insert(db, match_data['map'], 
                                    match_data['created_on'].isoformat(),
                                    score['terrorist'],
