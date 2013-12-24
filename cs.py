@@ -142,6 +142,29 @@ def execute_queries(db, pc, queries):
     db.commit()
 
 
+def is_init_log(f):
+    fp = open(f, 'r')
+    for i in range(10):
+        line = fp.readline()
+        if "Loading map" in line:
+            return True
+    return False
+
+
+def is_match_log(f):
+    fp = open(f, 'r')
+    for i in range(10):
+        line = fp.readline()
+        if 'World triggered "Round_Start"' in line:
+            return True
+    return False
+
+
+def archive_log(arch_dir, f):
+    dest = os.path.join(arch_dir, os.path.basename(f))
+    os.rename(f, dest)
+
+
 def process():
     logs = get_logs('logs')
     db = get_mysql()
@@ -149,6 +172,40 @@ def process():
     pc.update(db)
     fm = FactoryMatch()
     fe = FactoryEvent()
+    i = 0
+    while i < (len(logs) - 1):
+        if is_init_log(logs[i]):
+            match = logs[i]
+        else:
+            i += 1
+            continue
+        if is_match_log(logs[i+1]):
+            events = logs[i+1]
+        else:
+            i += 1
+            continue
+        if not (is_log_finish(match) and is_log_finish(events)):
+            i += 1
+            continue
+        match_data = fm.process(match)
+        event_data = process_log(events, pc)
+        update_profiles(db, pc)
+        score = get_match_score(event_data)
+        if score['terrorist'] is None or score['counter_terrorist'] is None:
+            i += 1
+            continue
+        match_id = MatchSql.insert(db, match_data['map'], 
+                                   match_data['created_on'].isoformat(),
+                                   score['terrorist'],
+                                   score['counter_terrorist'])
+        queries = generate_queries(match_id, event_data)
+        execute_queries(db, pc, queries)
+        arch_dir = 'logs/archive'
+        archive_log(arch_dir, match)
+        archive_log(arch_dir, events)
+        i += 2
+
+    '''
     for i in range(0, len(logs), 2):
         try:
             match = logs[i]
@@ -169,6 +226,7 @@ def process():
                                    score['counter_terrorist'])
         queries = generate_queries(match_id, event_data)
         execute_queries(db, pc, queries)
+    '''
 
 
 def get_match_score(event_data):

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 19, 2013 at 06:15 PM
+-- Generation Time: Dec 24, 2013 at 01:39 PM
 -- Server version: 5.5.31
 -- PHP Version: 5.3.10-1ubuntu3.9
 
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `Attack` (
   KEY `player_a` (`player_a`),
   KEY `player_b` (`player_b`),
   KEY `match_id` (`match_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3611 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4990 ;
 
 -- --------------------------------------------------------
 
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `Kill` (
   KEY `player_a` (`player_a`),
   KEY `player_b` (`player_b`),
   KEY `match_id` (`match_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=807 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1146 ;
 
 -- --------------------------------------------------------
 
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `Match` (
   `terrorist` int(11) NOT NULL,
   `counter_terrorist` int(11) NOT NULL,
   PRIMARY KEY (`match_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=33 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=47 ;
 
 -- --------------------------------------------------------
 
