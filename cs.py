@@ -29,6 +29,7 @@ import sys
 import MySQLdb.cursors
 import json
 from adt import ProfileContainer
+from adt import WeaponContainer
 from parser import FactoryEvent
 from parser import FactoryMatch
 from sqlgen import FactorySql
@@ -116,7 +117,7 @@ def update_profiles(db, pc):
         pc.submit_and_update(db)
 
 
-def generate_queries(match_id, events):
+def generate_queries(match_id, events, weapon_container):
     factory_sql = FactorySql()
     queries = []
     for i in events:
@@ -124,11 +125,18 @@ def generate_queries(match_id, events):
             continue
         event = i[0]
         damage = i[1]
+        weapon_id_swap(damage, weapon_container)
         sql = factory_sql.process(match_id, event, damage)
         if sql is None:
             continue
         queries.append(sql)
     return queries
+
+
+def weapon_id_swap(damage, weapon_container):
+    if 'weapon' in damage:
+        weapon_id = weapon_container.get_weapon_id(damage['weapon'])
+        damage['weapon'] = weapon_id
 
 
 def execute_queries(db, pc, queries):
@@ -162,6 +170,8 @@ def is_match_log(f):
 
 def archive_log(arch_dir, f):
     dest = os.path.join(arch_dir, os.path.basename(f))
+    if not os.path.exists(arch_dir):
+        os.makedirs(arch_dir)
     os.rename(f, dest)
 
 
@@ -172,6 +182,8 @@ def process():
     pc.update(db)
     fm = FactoryMatch()
     fe = FactoryEvent()
+    wc = WeaponContainer()
+    wc.populate(db)
     i = 0
     while i < (len(logs) - 1):
         if is_init_log(logs[i]):
@@ -198,11 +210,12 @@ def process():
                                    match_data['created_on'].isoformat(),
                                    score['terrorist'],
                                    score['counter_terrorist'])
-        queries = generate_queries(match_id, event_data)
+        queries = generate_queries(match_id, event_data, wc)
         execute_queries(db, pc, queries)
         arch_dir = 'logs/archive'
         archive_log(arch_dir, match)
         archive_log(arch_dir, events)
+        db.commit()
         i += 2
 
     '''

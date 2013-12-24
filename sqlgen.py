@@ -30,7 +30,6 @@ class MatchSql(object):
         c.execute('SELECT LAST_INSERT_ID();')
         match_id = c.fetchone()
         c.close()
-        db.commit()
         return match_id.values()[0]
 
 

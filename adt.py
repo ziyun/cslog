@@ -163,3 +163,26 @@ class AliasContainer(object):
 
     def __str__(self):
         return json.dumps(self._aliases, indent=4)
+
+
+class WeaponContainer(object):
+
+
+    def __init__(self):
+        self._weapons = {}
+
+
+    def populate(self, db, table="Weapon"):
+        c = db.cursor()
+        c.execute("SELECT `name`, `weapon_id` FROM `{}` WHERE 1;".format(table))
+        for row in c.fetchall():
+            self.add(row['name'], int(row['weapon_id']))
+        c.close()
+
+
+    def add(self, name, weapon_id):
+        self._weapons[name] = weapon_id
+
+
+    def get_weapon_id(self, name):
+        return self._weapons[name]
